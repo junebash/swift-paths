@@ -31,6 +31,14 @@ extension WritablePath {
 }
 
 
+public typealias ReadableWritablePath = ReadablePath & WritablePath
+
+
+public protocol FailablePath: ReadableWritablePath where ReadableValue == WritableValue? {
+    typealias Value = WritableValue
+}
+
+
 public protocol Path: ReadablePath, WritablePath {
     associatedtype Value where Value == ReadableValue, Value == WritableValue
 }
