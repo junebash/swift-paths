@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "swift-case-paths",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-case-paths",
+      "state" : {
+        "branch" : "main",
+        "revision" : "241301b67d8551c26d8f09bd2c0e52cc49f18007"
+      }
+    }
+  ],
+  "version" : 2
+}
