@@ -1,20 +1,12 @@
-public struct OptionalPath<Value>: PartialPath {
+public struct OptionalPath<Value>: ReadablePath, WritablePath {
+    public typealias Root = Value?
+
     public init() {}
-
-    public func getOpaqueValue(from root: Value?) -> Any? {
-        root
-    }
-}
-
-
-extension OptionalPath: ReadablePath {
+    
     public func get(from root: Value?) -> Value? {
         root
     }
-}
 
-
-extension OptionalPath: WritablePath {
     public func set(_ value: Value, in root: inout Value?) {
         root = value
     }
@@ -35,3 +27,4 @@ extension WritablePath {
         .init()
     }
 }
+
