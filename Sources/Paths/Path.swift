@@ -25,8 +25,14 @@ public protocol WritablePath: PartialPath {
 }
 
 extension WritablePath {
-    func getPossibleValue(from root: Root) -> WritableValue? {
+    public func getPossibleValue(from root: Root) -> WritableValue? {
         getOpaqueValue(from: root) as? WritableValue
+    }
+
+    public func setting(_ value: WritableValue, in root: Root) -> Root {
+        var root = root
+        set(value, in: &root)
+        return root
     }
 }
 
