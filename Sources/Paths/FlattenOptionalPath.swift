@@ -9,6 +9,9 @@ where Upstream.ReadableValue == Wrapped?? {
     }
 }
 
+extension FlattenOptionalPath: Sendable where Upstream: Sendable {}
+extension FlattenOptionalPath: Equatable where Upstream: Equatable {}
+
 extension ReadablePath {
     public func flattened<Wrapped>() -> FlattenOptionalPath<Self, Wrapped>
     where ReadableValue == Wrapped?? {

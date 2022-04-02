@@ -12,6 +12,8 @@ public struct SelfPath<Value>: Path {
     }
 }
 
+extension SelfPath: Equatable, Sendable {}
+
 extension Path {
     static func `self`<Value>(_ valueType: Value.Type = Value.self) -> SelfPath<Value>
     where Self == SelfPath<Value> {

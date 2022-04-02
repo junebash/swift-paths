@@ -37,6 +37,9 @@ where First: Path, Second: Path, First.Value == Second.Root? {
     }
 }
 
+extension OptionalAppendingPath: Sendable where First: Sendable, Second: Sendable {}
+extension OptionalAppendingPath: Equatable where First: Equatable, Second: Equatable {}
+
 extension ReadablePath {
     public func compactMap<Other: ReadablePath>(_ other: Other) -> OptionalAppendingPath<Self, Other>
     where ReadableValue == Other.Root? {
@@ -48,10 +51,3 @@ extension ReadablePath {
         FlattenOptionalPath(upstream: OptionalAppendingPath(first: self, second: other))
     }
 }
-
-struct Testtt {
-    var someText: String?
-}
-
-//let noteuh =
-let y = (\Testtt.someText).compactFlatMap(\String.first)

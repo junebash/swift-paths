@@ -1,4 +1,4 @@
-public struct OptionalPath<Value>: ReadablePath, WritablePath {
+public struct OptionalPath<Value>: FailablePath {
     public typealias Root = Value?
 
     public init() {}
@@ -11,6 +11,8 @@ public struct OptionalPath<Value>: ReadablePath, WritablePath {
         root = value
     }
 }
+
+extension OptionalPath: Equatable, Sendable {}
 
 
 extension ReadablePath {
@@ -27,4 +29,3 @@ extension WritablePath {
         .init()
     }
 }
-

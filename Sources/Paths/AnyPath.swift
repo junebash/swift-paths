@@ -84,5 +84,8 @@ public struct AnyReadableWritablePath<Root, ReadableValue, WritableValue>: Reada
     }
 }
 
-public typealias AnyOptionalPath<Root, Value> = AnyReadableWritablePath<Root, Value?, Value>
+extension AnyReadableWritablePath: FailablePath where ReadableValue == WritableValue? {}
+
+
+public typealias AnyFailablePath<Root, Value> = AnyReadableWritablePath<Root, Value?, Value>
 public typealias AnyPath<Root, Value> = AnyReadableWritablePath<Root, Value, Value>

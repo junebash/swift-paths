@@ -32,19 +32,21 @@ where First: Path, Second: WritablePath, First.Value == Second.Root {
     }
 }
 
+extension AppendingPath: FailablePath
+where
+    First: Path,
+    Second: FailablePath,
+    First.ReadableValue == Second.Root
+{}
+
 extension AppendingPath: Path
 where First: Path, Second: Path, First.Value == Second.Root {}
 
+extension AppendingPath: Sendable where First: Sendable, Second: Sendable {}
+extension AppendingPath: Equatable where First: Equatable, Second: Equatable {}
 
 extension ReadablePath {
     public func map<Other: PartialPath>(_ other: Other) -> AppendingPath<Self, Other> {
         .init(self, other)
     }
 }
-
-struct Temp {
-    var optionalText: String?
-}
-
-let x = \Temp.optionalText
-

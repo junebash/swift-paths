@@ -11,3 +11,5 @@ extension CasePath: WritablePath {
         root = self.embed(value)
     }
 }
+
+extension CasePath: FailablePath {}
