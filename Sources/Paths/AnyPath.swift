@@ -1,91 +1,35 @@
-import Foundation
-import UIKit
-public struct AnyPartialPath<Root>: PartialPath {
-    let get: (Root) -> Any?
+public struct AnyOptionalPath<Root, Value>: OptionalPath {
+    @usableFromInline
+    internal let _embed: (Value, inout Root) -> Void
+    @usableFromInline
+    internal let _extract: (Root) -> Value?
 
-    public init(get: @escaping (Root) -> Any?) {
-        self.get = get
-    }
-
-    public init<Wrapped: PartialPath>(_ wrapped: Wrapped) where Wrapped.Root == Root {
-        self.get = wrapped.getOpaqueValue(from:)
-    }
-
-    public func getOpaqueValue(from root: Root) -> Any? {
-        get(root)
-    }
-}
-
-
-public struct AnyReadablePath<Root, ReadableValue>: ReadablePath {
-    let get: (Root) -> ReadableValue
-
-    public init(get: @escaping (Root) -> ReadableValue) {
-        self.get = get
-    }
-
-    public init<Wrapped: ReadablePath>(_ wrapped: Wrapped)
-    where Wrapped.Root == Root, Wrapped.ReadableValue == ReadableValue {
-        self.get = wrapped.get(from:)
-    }
-
-    public func get(from root: Root) -> ReadableValue {
-        get(root)
-    }
-}
-
-
-public struct AnyWritablePath<Root, WritableValue>: WritablePath {
-    let set: (WritableValue, inout Root) -> Void
-
-    public init(set: @escaping (WritableValue, inout Root) -> Void) {
-        self.set = set
-    }
-
-    public init<Wrapped: WritablePath>(_ wrapped: Wrapped)
-    where Wrapped.Root == Root, Wrapped.WritableValue == WritableValue {
-        self.set = wrapped.set(_:in:)
-    }
-
-    public func set(_ value: WritableValue, in root: inout Root) {
-        set(value, &root)
-    }
-
-    public func getOpaqueValue(from root: Root) -> Any? {
-        nil
-    }
-}
-
-
-public struct AnyReadableWritablePath<Root, ReadableValue, WritableValue>: ReadablePath, WritablePath {
-    let get: (Root) -> ReadableValue
-    let set: (WritableValue, inout Root) -> Void
-
+    @inlinable
     public init(
-        get: @escaping (Root) -> ReadableValue,
-        set: @escaping (WritableValue, inout Root) -> Void
+        embed: @escaping (Value, inout Root) -> Void,
+        extract: @escaping (Root) -> Value?
     ) {
-        self.get = get
-        self.set = set
+        self._embed = embed
+        self._extract = extract
     }
 
-    public init<Wrapped: ReadablePath & WritablePath>(_ wrapped: Wrapped)
-    where Wrapped.Root == Root, Wrapped.ReadableValue == ReadableValue, Wrapped.WritableValue == WritableValue {
-        self.get = wrapped.get(from:)
-        self.set = wrapped.set(_:in:)
+    @inlinable
+    public func embed(_ value: Value, in root: inout Root) {
+        _embed(value, &root)
     }
 
-    public func get(from root: Root) -> ReadableValue {
-        get(root)
-    }
-
-    public func set(_ value: WritableValue, in root: inout Root) {
-        set(value, &root)
+    @inlinable
+    public func extract(from root: Root) -> Value? {
+        _extract(root)
     }
 }
 
-extension AnyReadableWritablePath: FailablePath where ReadableValue == WritableValue? {}
-
-
-public typealias AnyFailablePath<Root, Value> = AnyReadableWritablePath<Root, Value?, Value>
-public typealias AnyPath<Root, Value> = AnyReadableWritablePath<Root, Value, Value>
+extension OptionalPath {
+    @inlinable
+    public static func path<Root, Value>(
+        embed: @escaping (Value, inout Root) -> Void,
+        extract: @escaping (Root) -> Value?
+    ) -> AnyOptionalPath<Root, Value> where Self == AnyOptionalPath<Root, Value> {
+        .init(embed: embed, extract: extract)
+    }
+}

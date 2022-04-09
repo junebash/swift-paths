@@ -1,21 +1,25 @@
-public struct SelfPath<Value>: Path {
+public struct SelfPath<Value>: OptionalPath {
     public typealias Root = Value
 
+    @inlinable
     public init() {}
 
-    public func get(from root: Value) -> Value {
-        root
+    @inlinable
+    public func embed(_ value: Value, in root: inout Value) {
+        root = value
     }
 
-    public func set(_ value: Value, in root: inout Value) {
-        root = value
+    @inlinable
+    public func extract(from root: Value) -> Value? {
+        root
     }
 }
 
 extension SelfPath: Equatable, Sendable {}
 
-extension Path {
-    static func `self`<Value>(_ valueType: Value.Type = Value.self) -> SelfPath<Value>
+extension OptionalPath {
+    @inlinable
+    public static func `self`<Value>(_ valueType: Value.Type = Value.self) -> SelfPath<Value>
     where Self == SelfPath<Value> {
         .init()
     }

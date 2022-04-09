@@ -1,52 +1,30 @@
-public struct AppendingPath<First: PartialPath, Second: PartialPath>: PartialPath {
-    public typealias Root = First.Root
-
+public struct AppendingPath<First: OptionalPath, Second: OptionalPath>: OptionalPath
+where First.Value == Second.Root {
     public let first: First
     public let second: Second
 
-    init(_ first: First, _ second: Second) {
+    @inlinable
+    public init(first: First, second: Second) {
         self.first = first
         self.second = second
     }
 
-    public func getOpaqueValue(from root: First.Root) -> Any? {
-        guard let secondRoot = first.getOpaqueValue(from: root) as? Second.Root
-        else { return nil }
-        return second.getOpaqueValue(from: secondRoot)
+    @inlinable
+    public func embed(_ value: Second.Value, in root: inout First.Root) {
+        guard var mid = first.extract(from: root) else { return }
+        second.embed(value, in: &mid)
+        first.embed(mid, in: &root)
+    }
+
+    @inlinable
+    public func extract(from root: First.Root) -> Second.Value? {
+        first.extract(from: root).flatMap(second.extract(from:))
     }
 }
 
-extension AppendingPath: ReadablePath
-where First: ReadablePath, Second: ReadablePath, First.ReadableValue == Second.Root {
-    public func get(from root: First.Root) -> Second.ReadableValue {
-        second.get(from: first.get(from: root))
-    }
-}
-
-extension AppendingPath: WritablePath
-where First: Path, Second: WritablePath, First.Value == Second.Root {
-    public func set(_ value: Second.WritableValue, in root: inout First.Root) {
-        var secondRoot = first.get(from: root)
-        second.set(value, in: &secondRoot)
-        first.set(secondRoot, in: &root)
-    }
-}
-
-extension AppendingPath: FailablePath
-where
-    First: Path,
-    Second: FailablePath,
-    First.ReadableValue == Second.Root
-{}
-
-extension AppendingPath: Path
-where First: Path, Second: Path, First.Value == Second.Root {}
-
-extension AppendingPath: Sendable where First: Sendable, Second: Sendable {}
-extension AppendingPath: Equatable where First: Equatable, Second: Equatable {}
-
-extension ReadablePath {
-    public func map<Other: PartialPath>(_ other: Other) -> AppendingPath<Self, Other> {
-        .init(self, other)
+extension OptionalPath {
+    @inlinable
+    public func appending<Other: OptionalPath>(_ other: Other) -> AppendingPath<Self, Other> {
+        .init(first: self, second: other)
     }
 }
